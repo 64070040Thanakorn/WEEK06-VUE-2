@@ -68,7 +68,7 @@
                 </a>
 
             </div>
-            
+
             <div class="navbar-menu">
                 <div class="navbar-start">
                     <a href="../ex1/index.html" class="navbar-item">Basic of VueJS 2</a>
@@ -94,7 +94,8 @@
                     <div class="is-multiline columns is-variable is-2">
 
                         <!-- Card element start here------------------------------------------>
-                        <div id="card_product" class="column is-one-quarter" v-for="product in products">
+                        <div id="card_product" class="column is-one-quarter" v-for="(product, index) in products"
+                            :key="index">
                             <div class="card" v-bind:class="{'has-background-warning-light':product.is_favorite}">
                                 <div class="card-image">
                                     <figure class="image is-1by1">
@@ -128,7 +129,7 @@
                                         </div>
 
                                         <!-- >>>>>ไอคอนรูปตะกร้า <<<<<<,s----------------------------------------->
-                                        <div class="icon is-size-4" @click="cart.push(product)">
+                                        <div class="icon is-size-4" @click="addToCart(index)">
                                             <i class="fas fa-shopping-cart has-text-warning"></i>
                                         </div>
 
@@ -146,11 +147,11 @@
             <div class="column is-3 pt-6 pl-0 pr-5">
                 <div style="display: flex;justify-content: space-between;">
                     <span class="is-size-4 mb-4">Cart ({{cart.length}})</span>
-                    <a @click="cart = []" class="is-danger mb-4 button">Clear</a>
+                    <a @click="clearCart()" class="is-danger mb-4 button">Clear</a>
                 </div>
 
                 <!-- Card element start here ------------------------------------------>
-                <div v-for="product in cart" class="card mb-4">
+                <div v-for="(product, index) in cart" :key="index" class="card mb-4">
                     <div class="card-content p-0">
                         <div class="media">
                             <div class="media-left">
@@ -170,7 +171,7 @@
                                     </div>
                                     <div>
                                         <!-- icon รูปถังขยะ------------------------------------------- -->
-                                        <span class="icon mr-2" key="false">
+                                        <span class="icon mr-2" key="false" @click="removeFromCart(product, index)">
                                             <i class="far fa-trash-alt"></i>
                                         </span>
                                     </div>
@@ -181,11 +182,11 @@
                 </div>
                 <div style="display: flex;justify-content: space-between;font-size: 1.25rem;">
                     <span class="has-text-weight-bold">Total</span>
-                    <span id="totalPrice">123</span>
+                    <span id="totalPrice">{{productSummary}}</span>
                 </div>
 
                 <!-- ปุ่ม Checkout ------------------------------------------------------------ -->
-                <a class="button is-warning mt-3" style="width: 100%;">Checkout</a>
+                <a class="button is-warning mt-3" style="width: 100%;" @click="goCheckout()">Checkout</a>
 
             </div>
         </div>
@@ -272,8 +273,45 @@
                     },
                 ],
                 cart: [],
-                show_modal: false
+                show_modal: false,
             },
+            methods: {
+                addToCart(index) {
+                    if (!(this.cart.includes(this.products[index]))) {
+                        this.cart.push(this.products[index])
+                    }
+                    this.products[index].quantity++
+                },
+
+                removeFromCart(product, index) {
+                    this.cart.splice(index, 1)
+                    product.quantity = 0
+                },
+
+                clearCart() {
+                    this.cart = []
+                    for (let i = 0; i < this.products.length; i++) {
+                        this.products[i].quantity = 0
+                    }
+                },
+
+                goCheckout() {
+                    window.location.href = "./checkout.html"
+                    localStorage.setItem('cart', JSON.stringify(this.cart))
+
+                }
+            },
+
+            computed: {
+                productSummary() {
+                    let sum = 0
+                    for (let i = 0; i < this.cart.length; i++) {
+                        sum += this.cart[i].price * this.cart[i].quantity
+                    }
+
+                    return sum
+                }
+            }
         })
     </script>
 
