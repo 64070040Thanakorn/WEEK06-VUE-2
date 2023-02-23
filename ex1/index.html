@@ -57,15 +57,15 @@
                     </div>
                     <div class="column">
                         <label>Firstname</label>
-                        <input class="input" name="fname" v-model="fname" />
+                        <input class="input" name="fname" v-model="fname"/>
                     </div>
                     <div class="column">
                         <label>Lastname</label>
-                        <input class="input" name="lname" v-model="lname" />
+                        <input class="input" name="lname" v-model="lname"/>
                     </div>
                     <div class="column">
                         <label>Score</label>
-                        <input class="input" name="score" type="number" v-model="score" />
+                        <input class="input" name="score" type="number" v-model="score"/>
                     </div>
                 </div>
                 <code>prename = {{prename}}</code><br>
@@ -101,7 +101,7 @@
             <div id='ex2'>
 
                 <!-- ปุ่ม Add Student------------------- -->
-                <a class="button is-primary">Add Student</a>
+                <a class="button is-primary" @click="addStudent()">Add Student</a>
 
                 <div>
                     <table class="table">
@@ -114,12 +114,12 @@
                         </thead>
                         <tbody>
                             <!-- ตัวอย่างข้อมูล------------ -->
-                            <tr>
-                                <td>นายxxxxx yyyyy</td>
-                                <td>99</td>
+                            <tr v-for="(student, index) in students" :key="index">
+                                <td>{{student.prename}}{{student.fname}} {{student.lname}}</td>
+                                <td>{{student.score}}</td>
                                 <td>
                                     <!-- ปุ่ม Delete------------------- -->
-                                    <a class="button is-danger">Delete</a>
+                                    <a class="button is-danger" @click="removeStudent(index)">Delete</a>
                                 </td>
                             </tr>
 
@@ -168,14 +168,14 @@
                             <th class="is-warning">sum</th>
                             <td>
                                 <!-- แสดงผลรวมคะแนนที่นี้ -->
-                                120
+                                {{sumScore}}
                             </td>
                         </tr>
                         <tr>
                             <th class="is-primary">avarage</th>
                             <td>
                                 <!-- แสดงค่าเฉลี่ยที่นี่ -->
-                                12.3
+                                {{avarageScore}}
                             </td>
                         </tr>
                     </tbody>
@@ -213,16 +213,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>50</td>
-                            <td>48.5</td>
-                            <td style="color : red">- 1.5</td>
+                        <tr v-for="(log, index) in logs" :key="index">
+                            <td>{{log.current}}</td>
+                            <td>{{log.from}}</td>
+                            <td :style="{'color': log.color}">{{log.diff}}</td>
                         </tr>
-                        <tr>
+                        <!-- <tr>
                             <td>48.5</td>
                             <td>55</td>
                             <td style="color : green">+ 6.5</td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>
@@ -327,7 +327,86 @@
                 students: [],
                 logs: [],
                 dummyData: dummyData,
+                prename: "นาย",
+                fname: "สจัส",
+                lname: "ยัดไข่",
+                score: "100",
+                isActive: false,
             },
+
+            methods: {
+                addStudent() {
+                    if (this.prename === "" || this.fname === "" || this.lname === "" || this.score === "") {
+                        alert("Please enter all inputs")
+                        return false;
+                    }
+
+                    if (!(this.score >= 0 && this.score <= 100)) {
+                        alert("Score is incorrect")
+                        return false;
+                    }
+
+                    this.students.push({prename: this.prename, fname: this.fname, lname: this.lname, score: this.score})
+                    console.log(this.students)
+
+                    // this.prename = ""
+                    // this.fname = ""
+                    // this.lname = ""
+                    // this.score = ""
+                },
+
+                removeStudent(index) {
+                    this.students.splice(index, 1)
+                    console.log(this.students)
+                },
+
+            },
+
+            computed: {
+                sumScore() {
+                    let sum = 0
+                    for (var i = 0; i < this.students.length; i++) {
+                        sum += parseInt(this.students[i].score)
+                    }
+
+                    return sum
+                },
+
+                avarageScore() {
+                    if (this.students.length > 0) {
+                        return (this.sumScore/this.students.length).toFixed(2)
+                    }
+                    else {
+                        return 0
+                    }
+                },
+
+                // checkValue(index) {
+                //     if ((log - this.logs[index-1]) > (log - logs[index-2])) {
+                //         return "has-text-success"
+                //     }
+                //     else {
+                //         return "has-text-danger"
+                //     }
+                // },
+            },
+
+            watch: {
+                avarageScore:function(cVal, oldVal) {
+
+                    let vDiff = (cVal - oldVal).toFixed(2)
+                    if (cVal > oldVal) {
+                        vColor = 'green'
+                    }
+                    else [
+                        vColor = 'red'
+                    ]
+
+
+
+                    this.logs.push({current: cVal, from: oldVal, diff: vDiff, color: vColor})
+                }
+            }
         })
     </script>
 
