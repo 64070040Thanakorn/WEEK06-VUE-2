@@ -129,7 +129,7 @@
                                         </div>
 
                                         <!-- >>>>>ไอคอนรูปตะกร้า <<<<<<,s----------------------------------------->
-                                        <div class="icon is-size-4" @click="addToCart(index)">
+                                        <div class="icon is-size-4" @click="addToCart(product, index)">
                                             <i class="fas fa-shopping-cart has-text-warning"></i>
                                         </div>
 
@@ -275,12 +275,20 @@
                 cart: [],
                 show_modal: false,
             },
+            created () {
+                this.cart = JSON.parse(localStorage.getItem("cart"))
+            },
             methods: {
-                addToCart(index) {
-                    if (!(this.cart.includes(this.products[index]))) {
-                        this.cart.push(this.products[index])
+                addToCart(product, index) {
+                    console.log(this.cart.find(data => data.id === product.id))
+                    const value = this.cart.find(data => data.id === product.id)
+                    if (value) {
+                        value.quantity ++;
                     }
-                    this.products[index].quantity++
+                    else {
+                        this.cart.push(this.products[index])
+                        this.products[index].quantity++
+                    }
                 },
 
                 removeFromCart(product, index) {
